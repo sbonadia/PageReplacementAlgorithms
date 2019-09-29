@@ -1,9 +1,10 @@
-class Fifo {
+class Random {
     constructor(cache){
         this.cache = cache;
-        this.first_index = 0;
         this.hits =0;
         this.misses = 0;
+        this.seed = 0;
+        this.rnd = Math.floor(Math.random()*this.cache.size);
     }
     add(ref, key){
         var resp = ``;
@@ -13,18 +14,19 @@ class Fifo {
             resp += ` <------ hit`;
         } else {
             if(this.cache.positions.indexOf("empty") > -1){
+                resp += `\nposição na cache \t< ${ ref } >`;
                 this.cache.positions[this.cache.positions.indexOf("empty")] = ref;
                 resp += ` <------ compulsory miss`;
             } else {
+                this.rnd = Math.floor(Math.random()*this.cache.size);
                 resp += ` <------ miss`;
-                resp += `\nposição mais antiga: \t${ this.first_index}` ;
-                resp += `\nposição na cache \t< ${ this.cache.positions[this.first_index] } >`;
-                this.cache.positions[this.first_index] = ref;
-                this.first_index = (this.first_index + 1) % this.cache.size;
+                resp += `\nposição aleatória: \t${ this.rnd }` ;
+                resp += `\nposição na cache \t< ${ this.cache.positions[this.rnd] } >`;
+                this.cache.positions[this.rnd] = ref;
             }
             this.misses ++;
         }
         return resp;
     }
 }
-module.exports = Fifo;
+module.exports = Random;

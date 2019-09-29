@@ -1,11 +1,11 @@
 class Cache {
-    constructor(cache_size){
-        this.cache_size = cache_size;
-        this.cache = [];
-        for(let i=0; i< this.cache_size; i++){
-            this.cache.push("empty");
+    constructor(size){
+        this.size = size;
+        this.positions = [];
+        for(let i=0; i< this.size; i++){
+            this.positions.push("empty");
         }
-        //console.log(`Tamanho da Cache : ${ this.cache_size}`);
+        //console.log(`Tamanho da Cache : ${ this.size}`);
         //this.printCache();
     }
     printCache(){
@@ -15,7 +15,7 @@ class Cache {
         console.log(`  |  #pos. na cache   | #ref. da memória  |`);
         console.log(`  |-------------------+-------------------|`);
 
-        this.cache.forEach((value, key) => {
+        this.positions.forEach((value, key) => {
             var str = ``;
             let n = key.toString().length;
             for(let j=0; j< 18-n; j++){

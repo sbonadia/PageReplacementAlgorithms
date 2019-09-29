@@ -1,4 +1,8 @@
 
+const Fifo = require("./fifo");
+const LRU = require("./lru");
+const LFU = require("./lfu");
+const Random = require("./random");
 class MappingDirect {
     constructor (cache){
         this.cache  = cache;
@@ -8,25 +12,28 @@ class MappingDirect {
     run (mem_refs) {
         console.log("\n##### Executando Mapemaneto Direto #####");
         mem_refs.forEach((value, key) => {
-            var resp = value +" == "+ this.cache.cache[key % this.cache.cache_size];
-            if(value == this.cache.cache[key % this.cache.cache_size]) {
+            var resp = `posição de entrada \t< ${ value } >  \nposição na cache \t< ${ this.cache.positions[value % this.cache.size] } >`;
+            if(value == this.cache.positions[value % this.cache.size]) {
                 this.hits ++;
+                resp += ` <------  hit`;
             } else {
-                if(this.cache.cache[key % this.cache.cache_size] == "empty")
-                    resp += " <-- compulsory miss";
+                if(this.cache.positions[value % this.cache.size] == "empty")
+                    resp += ` <------ compulsory miss`;
                 else
-                    resp += " <-- miss";
-                this.cache.cache[key % this.cache.cache_size] = value;
+                    resp += ` <------  miss`;
+                this.cache.positions[value % this.cache.size] = value;
                 this.misses ++;
             }
-            console.log(resp)
-            this.cache.cache[key % this.cache.cache_size]
+            console.log(`\netapa ${1 + key*1}: `);
+            console.log(`${ resp }`);
+            this.cache.printCache();
+
         });
         console.log("\n##### Resultado Final #####");
         this.cache.printCache();
-        console.log( `Quantidade de hits: ${this.hits}` );
-        console.log( `Quantidade de misses: ${this.misses}` );
-        console.log( `Taxa de acertos: ${Math.floor((this.hits / mem_refs.length)*100)/100}%` );
+        console.log( `\tQuantidade de hits: \t${this.hits}` );
+        console.log( `\tQuantidade de misses: \t${this.misses}` );
+        console.log( `\tTaxa de acertos: \t${Math.floor((this.hits / mem_refs.length)*100)/100}%` );
     }
 }
 class MappingAssociative {
@@ -39,49 +46,30 @@ class MappingAssociative {
     run (mem_refs) {
         console.log(`\n##### Executando Mapemaneto Associativo #####`);
         console.log(`\n##### Método ${this.method} #####`);
-        var algorithm;
+        var rule;
         if(this.method == "FIFO"){
-            algorithm = new Fifo(this.cache);
+            rule = new Fifo(this.cache);
+        } else if (this.method == "LRU") {
+            rule = new LRU(this.cache);
+        } else if (this.method == "LFU") {
+            rule = new LFU(this.cache);
+        } else if (this.method == "RANDOM") {
+            rule = new Random(this.cache);
         }
+        
         mem_refs.forEach((value, key) => {
             
-            algorithm.add(value, key);
-            
+            console.log(`\netapa ${1 + key*1} `);
+            console.log(`${ rule.add(value, key)} `);
+            this.cache.printCache();
         });
-        console.log("\n##### Resultado Final #####");
+        console.log("\n\t##### Resultado Final #####");
         this.cache.printCache();
-        console.log( `Quantidade de hits: ${algorithm.hits}` );
-        console.log( `Quantidade de misses: ${algorithm.misses}` );
-        console.log( `Taxa de acertos: ${Math.floor((algorithm.hits / mem_refs.length)*100)/100}%` );
+        console.log( `\tQuantidade de hits: ${rule.hits}` );
+        console.log( `\tQuantidade de misses: ${rule.misses}` );
+        console.log( `\tTaxa de acertos: ${Math.floor((rule.hits / mem_refs.length)*100)/100}%` );
     }
 }
-class Fifo {
-    constructor(cache){
-        this.cache = cache;
-        this.first_index = 0;
-        this.hits =0;
-        this.misses = 0;
-    }
-    add(ref, key){
-        var resp = ref +" == "+ this.cache.cache ;
-        if(this.cache.cache.indexOf(ref) > -1){
-            this.hits ++;
-            resp += " -> hit";
-        } else {
-            //console.log(this.cache.cache.indexOf("empty"))
-            if(this.cache.cache.indexOf("empty") > -1){
-                this.cache.cache[this.cache.cache.indexOf("empty")] = ref;
-                resp += " -> compulsory miss";
-            } else {
-                this.cache.cache[this.first_index] = ref
-                this.first_index = (this.first_index + 1) % this.cache.cache_size;
-                resp += " -> miss";
-            }
-            this.misses ++;
-        }
-        console.log(resp)
-    }
-    
-}
+
 module.exports.MappingDirect = MappingDirect;
 module.exports.MappingAssociative = MappingAssociative;

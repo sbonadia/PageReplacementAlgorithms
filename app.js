@@ -9,7 +9,7 @@ console.log("## Simulador de algoritmos de substituição de página de memória
 console.log("############################################################################\n");
 
 //const App = require('./initializer');
-const prompt = require("prompt");
+//  const prompt = require("prompt");
 //const readers  = App.Readers;
 const readers = new Readers();
 var cache_size = 0;
