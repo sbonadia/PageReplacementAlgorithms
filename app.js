@@ -1,6 +1,7 @@
 const fs = require('fs');
 const Readers = require("./libs/readers");
 const Cache = require("./libs/cache");
+const CacheSet = require("./libs/cache_set");
 const Mapping = require("./libs/mapping");
 
 console.log("\n");
@@ -15,6 +16,7 @@ const readers = new Readers();
 var cache_size = 0;
 var map_type = "";
 var method = "";
+var sets = null;
 var error = -1;
 
 if(readers.get_path() != -1) {
@@ -35,6 +37,14 @@ if(readers.get_mapping() != -1) {
     error++;
 }
 if(map_type != "DIRECT") {
+    if(map_type == "ASSOCIATIVE_SET") {
+        if(readers.get_sets() != -1) {
+            sets = readers.get_sets();
+            console.log(`Conjuntos: ${ sets }`)
+        } else {
+            error++;
+        }
+    }
     if(readers.get_method() != -1) {
         method = readers.get_method();
         console.log(`Método utilizado: ${ method }`);
@@ -56,10 +66,11 @@ if( error < 0 ){
             var cache = new Cache( cache_size );
             if(map_type == "DIRECT") {
                 mapping = new Mapping.MappingDirect(cache);
-            } else if ("ASSOCIATIVE") {
+            } else if (map_type == "ASSOCIATIVE") {
                 mapping = new Mapping.MappingAssociative(cache, method);                
-            } else if ("ASSOCIATIVE_SET") {
-                mapping = new Mapping.MappingAssociativeSet(cache, method);                
+            } else if (map_type == "ASSOCIATIVE_SET") {
+                cache = new CacheSet( cache_size, sets );
+                mapping = new Mapping.MappingAssociativeSet(cache, method, sets);                
             }
             mapping.run(mem_refs);
         } else {

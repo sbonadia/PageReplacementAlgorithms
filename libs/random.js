@@ -6,23 +6,23 @@ class Random {
         this.seed = 0;
         this.rnd = Math.floor(Math.random()*this.cache.size);
     }
-    add(ref, key){
+    add(ref, positions){
         var resp = ``;
         resp += `posição de entrada \t< ${ ref } >`;
-        if(this.cache.positions.indexOf(ref) > -1){
+        if(positions.indexOf(ref) > -1){
             this.hits ++;
             resp += ` <------ hit`;
         } else {
-            if(this.cache.positions.indexOf("empty") > -1){
+            if(positions.indexOf("empty") > -1){
                 resp += `\nposição na cache \t< ${ ref } >`;
-                this.cache.positions[this.cache.positions.indexOf("empty")] = ref;
+                positions[positions.indexOf("empty")] = ref;
                 resp += ` <------ compulsory miss`;
             } else {
-                this.rnd = Math.floor(Math.random()*this.cache.size);
+                this.rnd = Math.floor(Math.random()*positions.length);
                 resp += ` <------ miss`;
                 resp += `\nposição aleatória: \t${ this.rnd }` ;
-                resp += `\nposição na cache \t< ${ this.cache.positions[this.rnd] } >`;
-                this.cache.positions[this.rnd] = ref;
+                resp += `\nposição na cache \t< ${ positions[this.rnd] } >`;
+                positions[this.rnd] = ref;
             }
             this.misses ++;
         }

@@ -10,7 +10,7 @@ class MappingDirect {
         this.misses = 0;
     }
     run (mem_refs) {
-        console.log("\n##### Executando Mapemaneto Direto #####");
+        console.log("\n##### Executando Mapeamento Direto #####");
         mem_refs.forEach((value, key) => {
             var resp = `posição de entrada \t< ${ value } >  \nposição na cache \t< ${ this.cache.positions[value % this.cache.size] } >`;
             if(value == this.cache.positions[value % this.cache.size]) {
@@ -24,7 +24,9 @@ class MappingDirect {
                 this.cache.positions[value % this.cache.size] = value;
                 this.misses ++;
             }
-            console.log(`\netapa ${1 + key*1}: `);
+            console.log(`\n===========================================`);
+            console.log(`\t\tETAPA ${1 + key*1} `);
+            console.log(`===========================================\n`);
             console.log(`${ resp }`);
             this.cache.printCache();
 
@@ -44,8 +46,8 @@ class MappingAssociative {
         this.misses = 0;
     }
     run (mem_refs) {
-        console.log(`\n##### Executando Mapemaneto Associativo #####`);
-        console.log(`\n##### Método ${this.method} #####`);
+        console.log(`\n##### Executando Mapeamento Associativo #####`);
+        console.log(`##### Método ${this.method} #####`);
         var rule;
         if(this.method == "FIFO"){
             rule = new Fifo(this.cache);
@@ -59,8 +61,52 @@ class MappingAssociative {
         
         mem_refs.forEach((value, key) => {
             
-            console.log(`\netapa ${1 + key*1} `);
-            console.log(`${ rule.add(value, key)} `);
+            console.log(`\n===========================================`);
+            console.log(`\t\tETAPA ${1 + key*1} `);
+            console.log(`===========================================\n`);
+            console.log(`${ rule.add(value, this.cache.positions)} `);
+            this.cache.printCache();
+        });
+        console.log("\n\t##### Resultado Final #####");
+        this.cache.printCache();
+        console.log( `\tQuantidade de hits: ${rule.hits}` );
+        console.log( `\tQuantidade de misses: ${rule.misses}` );
+        console.log( `\tTaxa de acertos: ${Math.floor((rule.hits / mem_refs.length)*100)/100}%` );
+    }
+}
+
+class MappingAssociativeSet {
+    constructor (cache, method, sets){
+        this.method = method;
+        this.cache  = cache;
+        this.sets    = sets || 1;
+        this.hits   = 0;
+        this.misses = 0;
+    }
+    run (mem_refs) {
+        console.log(`\n##### Executando Mapeamento Associativo por Conjunto #####`);
+        console.log(`##### Método ${this.method} #####`);
+        var rule;
+        if(this.method == "FIFO"){
+            rule = new Fifo(this.cache);
+        } else if (this.method == "LRU") {
+            rule = new LRU(this.cache);
+        } else if (this.method == "LFU") {
+            rule = new LFU(this.cache);
+        } else if (this.method == "RANDOM") {
+            rule = new Random(this.cache);
+        }
+        
+        mem_refs.forEach((value, key) => {
+            console.log(`\n======================================================`);
+            console.log(`\t\t\tETAPA ${1 + key*1} `);
+            console.log(`======================================================\n`);
+            console.log(`Conjunto ${value%this.sets} `);
+            console.log(`${ rule.add(value, this.cache.conjuntos[value%this.sets])} `);
+            for(let i=0; i<this.cache.positions.length; i++){
+                let conj = i%this.sets;
+                this.cache.positions[i] = this.cache.conjuntos[conj][Math.floor(i/this.sets)]
+            }
             this.cache.printCache();
         });
         console.log("\n\t##### Resultado Final #####");
@@ -73,3 +119,4 @@ class MappingAssociative {
 
 module.exports.MappingDirect = MappingDirect;
 module.exports.MappingAssociative = MappingAssociative;
+module.exports.MappingAssociativeSet = MappingAssociativeSet;

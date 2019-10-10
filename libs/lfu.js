@@ -3,41 +3,58 @@ class LFU {
         this.cache = cache;
         this.hits = 0;
         this.misses = 0;
-        this.last_req_array = new Array(this.cache.size); // auxiliar array
+        this.least_freq_array = new Array(this.cache.size); // auxiliar array
         for (let i = 0; i < this.cache.size; i++) {
-            this.last_req_array[i] =  -1; // default -1
+            this.least_freq_array[i] = { 
+                freq: 0,    // frequency access counter
+                count: 0        // cycles counter
+            };
         }
     }
     leastFrequencyUsed (){
-        return this.last_req_array.indexOf(Math.max(...this.last_req_array)); // return de least freaquency used
+        let min_array = this.least_freq_array.filter(n => n.freq == Math.min(...this.least_freq_array.map(d=>d.freq))); // get minimun frequency values
+        return this.least_freq_array.map(d=>d.count).indexOf( Math.max(...min_array.map(d=>d.count))); // get max cycles counter
+        //return this.least_freq_array.indexOf(Math.min(...this.least_freq_array)); // return de least freaquency used
     }
-    add(ref, key){
+    add(ref, positions){
         var resp = ``;
-        resp += `posição de entrada \t< ${ ref } >`;
-        for (let i = 0; i < this.cache.size; i++) {
-            this.last_req_array[i] += 1; // increment all positions
+        resp += (`\n  cont. de frequência de acesso   \n`);
+        resp += (`+--------------------------------+\n`);
+        resp += (`|  #cache  | #acessos | #ciclos  |\n`);
+        // console.log(`+--------------------------------+`);
+        for (let i = 0; i < positions.length; i++) {
+            this.least_freq_array[i].count += 1; // increment all positions
+            if(positions[i] == "empty") continue;
+            resp += (`|        ${ positions[i] } |        ${this.least_freq_array[i].freq } |        ${this.least_freq_array[i].count } |\n`);
         }
-        if(this.cache.positions.indexOf(ref) > -1){
+        resp += (`+--------------------------------+\n`);
+
+        resp += `\nEnd. de entrada: \t< ${ ref } >`;
+        // console.log(`+--------------------------------+`);
+        
+        if(positions.indexOf(ref) > -1){
             this.hits ++;
-            this.last_req_array[this.cache.positions.indexOf(ref)] = 0; // reset 
+            this.least_freq_array[positions.indexOf(ref)].freq += 1; // reset 
+            this.least_freq_array[positions.indexOf(ref)].count = 0; // reset 
             resp += ` <------ hit`;
         } else {
-            if(this.cache.positions.indexOf("empty") > -1){
-                this.last_req_array[this.cache.positions.indexOf("empty")] = 0;
-                this.cache.positions[this.cache.positions.indexOf("empty")] = ref;
+            if(positions.indexOf("empty") > -1){
+                this.least_freq_array[positions.indexOf("empty")].count = 0;
+                this.least_freq_array[positions.indexOf("empty")].freq = 0;
+                positions[positions.indexOf("empty")] = ref;
                 resp += ` <------ compulsory miss`;
             } else {
                 let old = this.leastFrequencyUsed();
                 resp += ` <------ miss`;
-                resp += `\nposição menos freq. acessada: \t${ old }` ;
-                resp += `\nContador de posições: ${this.last_req_array}`
-                resp += `\nposição na cache \t< ${ this.cache.positions[old] } >`;
-                this.last_req_array[old] = 0;
-                this.cache.positions[old] = ref;
+                resp += `\nEnd. menos freq. acessado: \t< ${ positions[old] } >` ;
+                //resp += `\nContador de posições: ${this.least_freq_array.map(d=>d.freq)}`
+                //resp += `\nendereço na cache \t< ${ positions[old] } >`;
+                this.least_freq_array[old].count = 0;
+                this.least_freq_array[old].freq = 0;
+                positions[old] = ref;
             }
             this.misses ++;
         }
-        //console.log(` ----------------> ${ this.last_req_array }`)
         return resp;
     }
 }

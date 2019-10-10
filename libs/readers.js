@@ -12,7 +12,7 @@ class Readers {
     get_mapping() {
         if(this.args.indexOf("--mapping") > 0 ) {
             let mapping = this.args[this.args.indexOf("--mapping") + 1].toUpperCase();
-            if(mapping == "DIRECT" || mapping == "ASSOCIATIVE"){
+            if(mapping == "DIRECT" || mapping == "ASSOCIATIVE" || mapping == "ASSOCIATIVE_SET"){
                 return mapping;
             }
             console.log("mapeamento inválido.");
@@ -27,6 +27,13 @@ class Readers {
             return this.args[this.args.indexOf("--method") + 1].toUpperCase();
         else
             console.log("método não definido")
+            return -1;
+    }
+    get_sets() {
+        if(this.args.indexOf("--sets") > 0 ) 
+            return this.args[this.args.indexOf("--sets") + 1].toUpperCase();
+        else
+            console.log("quantidade de conjuntos não definido")
             return -1;
     }
     get_path() {
