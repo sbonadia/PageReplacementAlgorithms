@@ -35,7 +35,7 @@ class MappingDirect {
         this.cache.printCache();
         console.log( `\tQuantidade de hits: \t${this.hits}` );
         console.log( `\tQuantidade de misses: \t${this.misses}` );
-        console.log( `\tTaxa de acertos: \t${Math.floor((this.hits / mem_refs.length)*100)/100}%` );
+        console.log( `\tTaxa de acertos: \t${(Math.floor((this.hits / mem_refs.length)*100)/100)*100}%` );
     }
 }
 class MappingAssociative {
@@ -71,7 +71,7 @@ class MappingAssociative {
         this.cache.printCache();
         console.log( `\tQuantidade de hits: ${rule.hits}` );
         console.log( `\tQuantidade de misses: ${rule.misses}` );
-        console.log( `\tTaxa de acertos: ${Math.floor((rule.hits / mem_refs.length)*100)/100}%` );
+        console.log( `\tTaxa de acertos: ${(Math.floor((rule.hits / mem_refs.length)*100)/100)*100}%` );
     }
 }
 
@@ -113,7 +113,7 @@ class MappingAssociativeSet {
         this.cache.printCache();
         console.log( `\tQuantidade de hits: ${rule.hits}` );
         console.log( `\tQuantidade de misses: ${rule.misses}` );
-        console.log( `\tTaxa de acertos: ${Math.floor((rule.hits / mem_refs.length)*100)/100}%` );
+        console.log( `\tTaxa de acertos: ${(Math.floor((rule.hits / mem_refs.length)*100)/100)*100}%` );
     }
 }
 

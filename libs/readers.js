@@ -39,7 +39,7 @@ class Readers {
     get_path() {
         if(this.args.indexOf("--filename") > 0) {
             let filename = this.args[this.args.indexOf("--filename") + 1];
-            var str = __dirname.replace("\\libs","") + "\\testes\\" + (filename);
+            var str = __dirname + "/../testes/" + (filename);
             if(filename.indexOf(".txt") < 0) str += ".txt";
             return str;
         } else {
