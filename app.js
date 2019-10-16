@@ -9,9 +9,6 @@ console.log("###################################################################
 console.log("## Simulador de algoritmos de substituição de página de memória em cache. ##");
 console.log("############################################################################\n");
 
-//const App = require('./initializer');
-//  const prompt = require("prompt");
-//const readers  = App.Readers;
 const readers = new Readers();
 var cache_size = 0;
 var map_type = "";
